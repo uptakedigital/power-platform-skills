@@ -1,0 +1,26 @@
+name: Sync fork with upstream
+
+# Keeps this fork's default branch up to date with its upstream (parent) repo.
+# Runs on a daily schedule and can also be triggered manually from the Actions tab.
+#
+# This uses `gh repo sync`, which performs a fast-forward merge from upstream via
+# GitHub's merge-upstream API. It will NOT overwrite any commits made directly in
+# this fork - if the fork has diverged from upstream, the sync step fails instead
+# of force-overwriting history, and the run shows as failed in the Actions tab.
+
+on:
+  schedule:
+    - cron: '17 0 * * *'   # ~daily, 00:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync fork from upstream
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh repo sync "${{ github.repository }}"
